@@ -7,8 +7,11 @@
 
 
 [ Criterions ]
+
 Fine-tuning    O      X
+
 Thr           150   Human
+
 Background    RGBB    7
 
 
