@@ -6,17 +6,30 @@
 - So, the train set = 500 * 100 * 32 * 32 * 32 ( or 500 * 100 * 3 * 32 * 32) , test set = 100 * 100 * 32 * 32 * 3 ( or 100 * 100 * 3 * 32 * 32 )
 
 
-TrainSet 50000으로 학습시킨 Accuracy 88.49% 짜리 ResNet에다가
-일일이 눈으로 Segmentation결과를 본 1015장을 Red,Green,Blue,Black으로 배경을 바꾼 4060장을
-Fine-Tuning 시켜보았더니 전부 Accuracy가 떨어지는 현상이발생(1)
+[ Criterions ]
+Fine-tuning    O      X
+Thr           150   Human
+Background    RGBB    7
 
-- 같은 hyperparmeter를 쓰더라도 어떨때는 낫고 어떨때는 떨어짐
-  아마 어떤 사진을 먼저 학습하냐에 따라 조금씩 차이가 있는것으로 생각됨
-- RRGB에 대한 acc는 90%가 넘는 경우도 있었으나 이 경우에도 TestSet에 대한 acc는 많이 떨어짐(2)
-- RRGB를 적게쓸수록 TestSet에 대한 acc하락이 줄어드는 경향이 확인됨(3)
 
-6.10
-- Fine-Tuning이 아닌 백지의 ResNet에 Train(50000)+RRGB(1015*4)를 더해 섞은다음 처음부터 학습시켜봄(4)
-  하지만 학습이 되지않고 Train(50000)만 가지고 fine-tuning하는 코드로 학습을 해도 학습이 되지않는 현상을 발견 (5)
-  아마도 학습을 시키는 과정의 코드어딘가가 문제일수도
-  ResNet백지에 내 코드와 수영님 코드(6)를 두개다 학습시켜본뒤 비교해보고 어떤게 문제인지 확인해보기
+(1)Pre-trained ResNet에 28519*4로 fine- tuning한 결과 84.4%가 됨.
+(2)Pre-trained ResNet에 1015*4로 fine-tuning한 결과 81.5%가 됨
+(3) (1)에서 Fine-tuning data를 random으로 몇개만 뽑아서 해봄 84.4%와 거의 비슷
+(4-1) ResNet Train+RGBB(28519*4) 섞어서 처음부터 학습  86.5%
+(4-2) ResNet Train+RGBB(1015*4) 섞어서 처음부터 학습 88.77%
+(4-3) "(4-3) 수정완료본 이거대로 돌리면됨" 여기에 저장됨 이제 이걸로 (4-1),(4-2) ㄱㄱ
+
+(8-1) Only use well segmened data (1015)           1015개만으로 학습시켜봄
+(8-2) Only use well segmened data (1015 + 1015*4)  1015 + 1015*4 로 학습시켜봄
+(8-3) Only use well segmened data 1015 + 1015 ( original + Black )
+(8-5) FT - 0 . Thr = Human , Background - only black
+(8-6) Only use well segmented data (1015 + 1015*4) on Pre-trained ResNet
+
+
+(7) Backgound를 각 Class를 대표하는 배경 7개를 임의로 선택
+(7-8) 1015 + 1015*7 로 학습
+
+(7-1) FT-O , Thr =  150  , Background-7   80.69%
+(7-2) FT-O , Thr = Human , Background-7   76.33%
+(7-3) FT-X , Thr =  150  , Background-7   86.94%
+(7-4) FT-X , Thr = Human , Background-7   89.04%
